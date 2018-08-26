@@ -1,0 +1,208 @@
+import java.util.ArrayList;
+import java.util.*;
+public class Bracket
+{
+    private int byes;
+    private ArrayList<Player> attendents;
+    public Bracket(ArrayList<Player> a){
+        byes = (int)Math.pow(2, (int)Math.ceil(Math.log(a.size())/Math.log(2)))
+        -a.size();
+        attendents = a;
+    }
+    
+    public void projectedBracket (){
+        
+    }
+}
+
+import java.util.*;
+public class Player
+{
+    private int events;
+    private int dateDif;
+    private int skill;
+    private String name;
+    private boolean setUp;
+    public Player (int events, String date, int skill, String name, 
+    boolean setUp, int dateValue){
+        this.events = events;
+        this.skill = skill;
+        this.name = name;
+        this.setUp = setUp;
+        
+        int m = Integer.parseInt(date.substring(0,2));
+        int month=0;
+        for (int i = 0; i<m-1; i ++){
+            if (m==1)
+                month += 28;
+            else if (m==3||m==5||m==8||m==10)
+                month += 30;
+            else
+                month +=31;
+        }
+        month += Integer.parseInt(date.substring(3,5)) + 
+        Integer.parseInt(date.substring(6))*365;
+        dateDif = month;
+    }
+    -----------------------new class-----------------------------------
+    public Player (int events, int skill, String name, boolean setUp){
+        this.events=events;
+        this.skill=skill;
+        this.name=name;
+        this.setUp=setUp;
+    }
+    
+    public void setSkill(int updated){
+        this.skill = updated;
+    }
+    
+    public int getSkill(){
+        return skill;
+    }
+    
+    public String getName(){
+        return name;
+    }
+    
+    public boolean getSetUp (){
+        return setUp;
+    }
+    
+    public int getEvents(){
+        return events;
+    }
+    
+    public int getDateDif(){
+        return dateDif;
+    }
+    
+    
+}
+
+-------------------new class---------------------
+import java.util.*;
+import java.util.ArrayList;
+import java.awt.*;
+import javax.swing.*;
+public class TourneyDetails
+{
+    private ArrayList<Player> attendees = new ArrayList<Player>();
+    private int dateValue;
+    private int venue;
+    private int netCost;
+    private int bracket;
+    private Bracket brack;
+    public TourneyDetails (String date){
+        int m = Integer.parseInt(date.substring(0,2));
+        int month=0;
+        for (int i = 0; i<m-1; i ++){
+            if (m==1)
+                month += 28;
+            else if (m==3||m==5||m==8||m==10)
+                month += 30;
+            else
+                month +=31;
+        }
+        month += Integer.parseInt(date.substring(3,5)) + 
+        Integer.parseInt(date.substring(6))*365;
+        dateValue = month;
+        netCost=0;
+        venue=-1;
+    }
+
+    public TourneyDetails (int venueFee, int perBracket){
+        dateValue = 0;
+        venue=venueFee;
+        netCost=0;
+        bracket = perBracket;
+    }
+
+    public void addPlayer (int events, String date, int skill, String name,
+    boolean setUp){
+        
+        Player a = new Player (events, skill, name, setUp);
+        if (!date.equals(""))
+            a = new Player(events, date, skill, name, setUp, dateValue);
+        
+        if (venue==-1){
+            int ans = 0;
+            ans += events*10;
+            if (setUp)
+                ans-=10;
+            if (dateValue-a.getDateDif() > 0 && dateValue-a.getDateDif() < 31)
+                ans+=50;
+            else if (dateValue-a.getDateDif() >=31 && dateValue-a.getDateDif() < 61)
+                ans+=40;
+            else
+                ans +=30;
+            netCost+=ans;
+        }
+        else {
+            netCost+=events*bracket + venue;
+            if (setUp)
+                netCost-=5;
+
+        }
+        if (attendees.size()==0){
+            attendees.add(a);
+            return;
+        }
+        for (int i = 0; i < attendees.size(); i ++){
+            if (a.getSkill()<attendees.get(i).getSkill())continue;
+            if (a.getSkill()>=attendees.get(i).getSkill())attendees.add(i,a);return;
+        }
+        attendees.add(a);
+    }
+
+    public int getDateValue(){
+        return dateValue;
+    }
+
+    public void whosAttending (){
+        for (int i = 0; i <attendees.size(); i++){
+            System.out.println(attendees.get(i).getName());
+        }
+    }
+
+    public int paycheckSoFar (){
+        return netCost;
+    }
+
+    public void changeSeeding (String name){
+        Player temp;
+        for (int i = 0; i < attendees.size(); i++){
+            if (attendees.get(i).getName().equals(name)&&i==0){
+                temp = attendees.get(i);
+                attendees.remove(0);
+                attendees.add(1,temp);
+                return;
+            }
+            else if(attendees.get(i).getName().equals(name)){
+                temp = attendees.get(i);
+                attendees.remove(i);
+                attendees.add(i-1,temp);
+                return;
+            }
+        }
+        System.out.println("This person isn't in the bracket. Check to make sure the name was inputted correctly");
+
+    }
+
+    public void createBracket(){
+        brack = new Bracket (attendees);
+        if (attendees.size()<4){
+            System.out.println("Not enough people for a bracket, round robin is suggested");
+            return;
+        }
+        
+    }
+
+    public int getVenueFee (){
+        return venue;
+    }
+    
+    public void colorTest (){
+        String text = "<html><font color='orange'>This</font> is a test";
+        System.out.println("" + text);
+    }
+}
